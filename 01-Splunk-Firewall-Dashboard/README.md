@@ -1,0 +1,147 @@
+# 📊 Fortigate Firewall Continuous Monitoring Suite
+
+## 📋 Scenario & Business Problem
+Enterprise perimeter boundaries are subjected to constant automated scanning, adversarial probing, and unauthorized access attempts. Security Operations Centers (SOC) require interactive, centralized visibility to baseline continuous infrastructure telemetry and isolate operational anomalies. 
+
+Without clean metrics aggregation, high-volume firewall noise easily buries indicators of compromise (IOCs). This project deploys a continuous monitoring dashboard engine to track connection behaviors, isolate anomalous protocols, map external geolocations, and expose hidden activity trends against standard network data streams.
+
+## 💡 Solution Architecture
+This project implements a functional security telemetry suite written in Splunk XML dashboards and advanced Search Processing Language (SPL).
+1. **Volumetric Isolation:** Separates total baseline allowed traffic against active blocked events to instantly expose perimeter probing waves.
+2. **RFC 1918 Private Network Filtering:** Scrubs internal local subnets (`10.0.0.0/8`, `192.168.0.0/16`, `172.16.0.0/12`) from source and destination queries to isolate unique external inbound actors and outbound target systems.
+3. **Logarithmic Chart Flattening:** Enforces a math-driven Y-axis log scale (`<option name="charting.axisY.scale">log</option>`) to level the data display, preventing high-volume authorized traffic from hiding stealth low-and-slow access profiles.
+4. **Protocol Profiling:** Organizes transactional connections by structural standard transport IDs to track unauthorized tunneling and protocol modifications.
+
+## 🏗️ Technical Components
+* **Dataset Engine Utilized:** BOTS v1 (Boss of the SOC) Security Repository
+* **Telemetry Focus:** Fortigate Enterprise Firewall Log Infrastructure (`sourcetype=fortigate_traffic`)
+* **Visualization Layer:** Splunk Simple XML Dashboard UI v1.1 Architecture
+* **Core Commands Leveraged:** `stats count`, `cidr match notation filtering`, `logarithmic axis scaling`
+
+---
+
+## 🛠️ Splunk Dashboard XML Source Blueprint
+
+```xml
+<dashboard version="1.1" theme="light">
+  <label>Fortigate Enterprise Firewall Monitoring Engine</label>
+  <row>
+    <panel>
+      <title>Blocked Connections</title>
+      <single>
+        <search>
+          <query>index=botsv1 sourcetype=fortigate_traffic action=blocked | stats count(action)</query>
+          <earliest>0</earliest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="colorBy">value</option>
+        <option name="colorMode">none</option>
+        <option name="drilldown">none</option>
+        <option name="numberPrecision">0</option>
+        <option name="rangeColors">["0x53a051", "0x0877a6", "0xf8be34", "0xf1813f", "0xdc4e41"]</option>
+        <option name="rangeValues"></option>
+        <option name="showSparkline">1</option>
+        <option name="showTrendIndicator">1</option>
+        <option name="trellis.enabled">0</option>
+        <option name="trellis.scales.shared">1</option>
+        <option name="trellis.size">medium</option>
+        <option name="trendColorInterpretation">standard</option>
+        <option name="trendDisplayMode">absolute</option>
+        <option name="unitPosition">after</option>
+        <option name="useColors">0</option>
+        <option name="useThousandSeparators">1</option>
+      </single>
+    </panel>
+    <panel>
+      <title>Allowed Connections</title>
+      <single>
+        <search>
+          <query>index=botsv1 sourcetype=fortigate_traffic action=allowed | stats count(action)</query>
+          <earliest>0</earliest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="colorBy">value</option>
+        <option name="colorMode">none</option>
+        <option name="drilldown">none</option>
+        <option name="numberPrecision">0</option>
+        <option name="rangeColors">["0x53a051", "0x0877a6", "0xf8be34", "0xf1813f", "0xdc4e41"]</option>
+        <option name="rangeValues"></option>
+        <option name="showSparkline">1</option>
+        <option name="showTrendIndicator">1</option>
+        <option name="trellis.enabled">0</option>
+        <option name="trellis.scales.shared">1</option>
+        <option name="trellis.size">medium</option>
+        <option name="trendColorInterpretation">standard</option>
+        <option name="trendDisplayMode">absolute</option>
+        <option name="unitPosition">after</option>
+        <option name="useColors">0</option>
+        <option name="useThousandSeparators">1</option>
+      </single>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>External Source IPs</title>
+      <chart>
+        <search>
+          <query>index=botsv1 sourcetype=fortigate_traffic src_ip!=10.0.0.0/8 src_ip!=192.168.0.0/16 src_ip!=172.16.0.0/12 | stats count by src_ip</query>
+          <earliest>0</earliest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="charting.chart">line</option>
+        <option name="charting.drilldown">none</option>
+        <option name="charting.legend.placement">right</option>
+      </chart>
+    </panel>
+    <panel>
+      <title>External Destination IPs</title>
+      <chart>
+        <search>
+          <query>index=botsv1 sourcetype=fortigate_traffic dest_ip!=10.0.0.0/8 dest_ip!=192.168.0.0/16 dest_ip!=172.16.0.0/12 | stats count by dest_ip | head 1000</query>
+          <earliest>0</earliest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="charting.chart">line</option>
+        <option name="charting.drilldown">none</option>
+        <option name="charting.legend.placement">right</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Network Traffic by Action (Logarithmic Scale)</title>
+      <chart>
+        <search>
+          <query>index=botsv1 sourcetype=fortigate_traffic | stats count by action</query>
+          <earliest>0</earliest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="charting.chart">column</option>
+        <option name="charting.axisY.scale">log</option>
+        <option name="charting.axisTitleX.text">Firewall Action</option>
+        <option name="charting.axisTitleY.text">Event Count (Log Scale)</option>
+        <option name="charting.legend.placement">none</option>
+        <option name="charting.chart.showDataLabels">all</option>
+      </chart>
+    </panel>
+    <panel>
+      <title>Traffic by Protocol</title>
+      <chart>
+        <search>
+          <query>index=botsv1 sourcetype=fortigate_traffic | stats count by proto | rename proto as "Protocol Number", count as "Total Connections" | sort - "Total Connections"</query>
+          <earliest>0</earliest>
+        </search>
+        <option name="charting.chart">pie</option>
+        <option name="charting.drilldown">none</option>
+      </chart>
+    </panel>
+  </row>
+</dashboard>
+```
+
+---
+
+## 🚀 How to Deploy inside Splunk Enterprise
+1. Copy the complete source code block from the XML dashboard architecture definition block above.
+2. Open your target Splunk Web UI instance, click **Dashboards** via your primary app launcher panel, and choose **Create New Dashboard**.
+3. Clear the default structural layout parameters, paste your customized operational code layout block directly inside the module, and click **Save**.
