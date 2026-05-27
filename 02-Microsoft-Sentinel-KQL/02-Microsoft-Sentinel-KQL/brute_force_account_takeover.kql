@@ -1,0 +1,18 @@
+let FailedLogons = 
+    SecurityEvent
+
+    | where TimeGenerated > ago(1h)
+    | where EventID == 4625
+    | summarize FailureCount = count() by Account, IpAddress, TargetLogonId
+
+    | where FailureCount >= 5;
+let SuccessfulLogons = 
+    SecurityEvent
+    | where TimeGenerated > ago(1h)
+    | where EventID == 4624
+
+    | project TimeOfSuccess = TimeGenerated, Account, IpAddress, LogonType;
+FailedLogons
+| join kind=inner (SuccessfulLogons) on Account, IpAddress
+| project TimeOfSuccess, Account, IpAddress, FailureCount, LogonType
+| extend HostCustomEntity = Account, IPCustomEntity = IpAddress
