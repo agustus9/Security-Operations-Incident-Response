@@ -1,0 +1,53 @@
+<dashboard version="1.1" theme="dark">
+  <label>Suricata IDS/IPS Security Operations Dashboard</label>
+  
+  <!-- ROW 1: KEY PERFORMANCE INDICATOR -->
+  <row>
+    <panel>
+      <title>Total IDS/IPS Alerts</title>
+      <single>
+        <search>
+          <query>index=botsv1 sourcetype=suricata event_type=alert | stats count as "Total Alerts"</query>
+          <earliest>0</earliest>
+          <latest>now</latest>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="refresh.display">progressbar</option>
+      </single>
+    </panel>
+  </row>
+
+  <!-- ROW 2: THREAT ANALYSIS & ATTACK VECTORS -->
+  <row>
+    <panel>
+      <title>Top 10 High-Severity Threat Actors</title>
+      <chart>
+        <search>
+          <query>index=botsv1 sourcetype=suricata event_type=alert | eval severity=coalesce('alert.severity', alert_severity) | search severity &lt;= 2 | stats count as Attack_Count by src_ip | sort - Attack_Count | head 10</query>
+          <earliest>0</earliest>
+          <latest>now</latest>
+        </search>
+        <option name="charting.chart">bar</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">none</option>
+        <option name="charting.legend.placement">right</option>
+        <option name="refresh.display">progressbar</option>
+      </chart>
+    </panel>
+    
+    <panel>
+      <title>Most Targeted Infrastructure Ports</title>
+      <chart>
+        <search>
+          <query>index=botsv1 sourcetype=suricata event_type=alert | stats count as Port_Hits by dest_port | sort - Port_Hits | head 10</query>
+          <earliest>0</earliest>
+          <latest>now</latest>
+        </search>
+        <option name="charting.chart">pie</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">none</option>
+        <option name="refresh.display">progressbar</option>
+      </chart>
+    </panel>
+  </row>
+</dashboard>
