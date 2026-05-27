@@ -32,15 +32,6 @@ This section houses production-ready **Kusto Query Language (KQL)** SIEM analyti
 * **Objective:** Correlates consecutive Windows security event logon failures with a subsequent successful authentication event from the same entity to flag credential compromise.
 * **Engineering Skills:** Multi-source dataset correlation using internal table variables (`let`), conditional behavioral threshold rules, memory-optimized inner joins, and entity mapping for SIEM automation.
 * **Source Code:** [`brute_force_account_takeover.kql`](./02-Microsoft-Sentinel-KQL/brute_force_account_takeover.kql)
-## 🏗 SOC Telemetry & Engineering Matrix
-
-
-| Analytics Domain | Platform Engine | Focus & Query Syntax | Enterprise Security Portfolio |
-| :--- | :--- | :--- | :--- |
-| 🛡 **Network Security Monitoring** | Splunk Enterprise | SPL & Advanced Event Chaining | [Enterprise Security Suite](./01-Splunk-Firewall-Dashboard) |
-| 🔍 **Threat Detection** | Microsoft Sentinel | KQL & Multi-Source Correlation | *In Development* |
-| 📊 **Log Analysis** | IBM QRadar | AQL & Privilege Auditing | *In Development* |
-| 💻 **Endpoint Defense** | EDR Platforms | Rule Tuning & Playbook Design | *In Development* |
 
 
 
