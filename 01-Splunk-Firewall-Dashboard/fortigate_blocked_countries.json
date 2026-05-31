@@ -1,0 +1,59 @@
+{
+  "visualizations": {
+    "viz_blocked_map": {
+      "type": "splunk.map",
+      "options": {
+        "zoom": 2
+      },
+      "dataSources": {
+        "primary": "ds_blocked_countries"
+      }
+    },
+    "viz_blocked_chart": {
+      "type": "splunk.bar",
+      "options": {
+        "xAxisTitleText": "Total Blocked Attempts",
+        "yAxisTitleText": "Country"
+      },
+      "dataSources": {
+        "primary": "ds_blocked_countries"
+      }
+    }
+  },
+  "dataSources": {
+    "ds_blocked_countries": {
+      "type": "ds.search",
+      "options": {
+        "query": "index=botsv1 sourcetype=\"fgt_traffic\" (action=deny OR action=DENY OR action=blocked)\n| iplocation src\n| fillnull value=\"Internal/Unknown\" Country\n| stats count by Country\n| sort - count\n| head 10\n| rename Country as \"Country\", count as \"Blocked Connections\""
+      }
+    }
+  },
+  "title": "Fortigate Firewall - Top Blocked Countries",
+  "description": "Intermediate Splunk dashboard tracking external attack origins from BOTSv1 data.",
+  "layout": {
+    "type": "absolute",
+    "options": {},
+    "structure": [
+      {
+        "item": "viz_blocked_map",
+        "type": "block",
+        "position": {
+          "x": 0,
+          "y": 0,
+          "w": 600,
+          "h": 400
+        }
+      },
+      {
+        "item": "viz_blocked_chart",
+        "type": "block",
+        "position": {
+          "x": 620,
+          "y": 0,
+          "w": 580,
+          "h": 400
+        }
+      }
+    ]
+  }
+}
