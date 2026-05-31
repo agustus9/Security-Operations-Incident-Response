@@ -14,7 +14,7 @@
 
 ### 🌐 Enterprise Network Security Monitoring Suite (Splunk Enterprise)
 Utilizes the BOTS v1 dataset to deliver centralized visibility into perimeter traffic patterns and network intrusions.
-* 🧱 **[Fortigate Firewall Traffic Analytics](./01-Splunk-Firewall-Dashboard):** Monitors baseline perimeter traffic flow, inbound connection volumes, and geographic origins to detect reconnaissance.
+- 🧱 [**Fortigate Firewall Traffic Analytics**](./01-Splunk-Firewall-Dashboard/fortigate_blocked_countries.json): Monitors baseline perimeter traffic flow, inbound connection volumes, and geographic origins to detect reconnaissance using intermediate-level `iplocation` and field handling filters.
 * 🚨 **[Suricata Intrusion Detection (IDS/IPS) Center](./01-Splunk-Firewall-Dashboard/suricata_ids_dashboard.xml):** Real-time analysis of signature-based malicious activity, targeting patterns, and active protocol exploitation.
 
 ---
